@@ -1,0 +1,119 @@
+<% if user_signed_in? %>
+	<div>
+		<span>
+		<h6 align="right"><%= current_user.email %></h6>
+		</span>
+	</div>
+<%else%>
+	<h3 align="right">Welcome Guest</h3>
+<%end %>
+<h1>Blogs</h1>
+<% unless @blog.blank? %>
+		<div id = "body">
+			<p>
+			  <strong>Title:</strong>
+			  <h6 class="body" style= <%= @blog.style %> >
+			  <%= @blog.title %></h6>
+			</p>
+
+			<p>
+			  <strong>Body:</strong> 
+			  <h6 class="body" style= <%= @blog.style %>>
+			  <%= @blog.body %></h6>
+			</p>
+			<p>
+				<%#= link_to 'Edit', edit_blog_path(@blog) %> 
+				<%#= link_to 'Back', blogs_path %>
+				<a id = "edit">Edit CSS</a>
+			</p>
+			<div id="sd">
+					<p>
+						<h6 id = "cl" class="col-md-1" > Color
+
+	            <select id="color" onchange="changeElement();">
+	              <% Blog::COLOR.each do |x| %>
+	                <option style="color: <%= x%>" value= <%= x %>><%= x%></option>
+	              <%end%>
+	            </select>
+	          </h6> 
+	          <h6 id = "fn" class="col-md-1">Font
+	            <select id = "font" onchange="changeElement();">
+	              <% Blog::FONT.each do |x| %>
+	                <option style="font-family: <%= x%>" value= <%= x %>><%= x%></option>
+	              <%end%>
+	            </select>
+	          </h6> 
+	          <h6 id = "fz" class="col-md-1" >Font-size
+	          	<select id = "size" onchange="changeElement();">
+	          		<% (10..1000).each do |x| %>
+	                <option style="font-size: <%= x%>" value= <%= x %>><%= x%></option>
+	              <%end%>
+	            </select>
+	          </h6>
+	          <li>
+              <input type="submit" value="Apply" id = "apply"onclick="select_color(<%= @blog.id%>)" >
+            </li>
+	          </p>
+			</div>
+		</div>	
+<%else%>
+  <h3 class="col-md-6"><%= link_to 'New Blog', new_blog_path %></h3>
+<%end%>
+<br>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#sd").hide();
+		$("#color").hide();
+		$("#font").hide();
+    $("#size").hide();
+		$("#edit").click(function(){
+        $("#sd").slideToggle();
+    });
+
+    $("#cl").click(function(){
+        $("#color").show();
+        $("#font").hide();
+        $("#size").hide();
+    });
+
+    $("#fn").click(function(){
+        $("#color").hide();
+        $("#font").show();
+        $("#size").hide();
+    });
+
+    $("#fz").click(function(){
+        $("#color").hide();
+        $("#font").hide();
+        $("#size").show();
+    });
+	});
+
+	function changeElement() {
+    var element = $(".body");
+    element.style.color =  $('#color').val();
+    element.style.fontSize = $('#size').val();
+    element.style.fontFamily =  $('#font').val();
+  }
+
+	function select_color(id){
+    var color = $('#color').val();
+    var bg = $('#bg').val();
+    var font = $('#font').val();
+    var size =  $('#size').val();
+    var style = 'color:' + color + ';' + 'font-family:' + font + ';' + 'font-size:' + size + 'px;'
+    var data = { 'style': style, 'id' : id, 'background' : bg }
+    $.ajax({
+      url : '/blogs/' + id + '/ajax_update',
+      data : data,
+      type : 'GET',
+      contentType : 'application/js',
+      dataType : 'html'
+    });
+    $(".custom-menu").hide();
+  }
+
+</script>
+
+
